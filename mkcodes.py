@@ -3,8 +3,6 @@ import re
 import glob
 import warnings
 
-import click
-
 try:
     import markdown as markdown_enabled
 except ImportError:
@@ -19,7 +17,7 @@ def github_codeblocks(filepath, safe):
     codeblock_re = r'^```.*'
     codeblock_open_re = r'^```(`*)(py|python){0}$'.format('' if safe else '?')
 
-    with open(filepath, 'r') as f:
+    with open(filepath, 'r', encoding="utf-8") as f:
         block = []
         python = True
         in_codeblock = False
@@ -98,7 +96,7 @@ def makedirs(directory):
             directory, tail = os.path.split(directory)
             to_make.append(tail)
         else:
-            with open(os.path.join(directory, '__init__.py'), 'w'):
+            with open(os.path.join(directory, '__init__.py'), 'w', encoding="utf-8"):
                 pass
             if to_make:
                 directory = os.path.join(directory, to_make.pop())
@@ -106,16 +104,18 @@ def makedirs(directory):
                 break
 
 
-@click.command()
-@click.argument(
-    'inputs', nargs=-1, required=True, type=click.Path(exists=True))
-@click.option('--output', default='{name}.py')
-@click.option('--github/--markdown', default=bool(not markdown_enabled),
-              help='Github-flavored fence blocks or pure markdown.')
-@click.option('--safe/--unsafe', default=True,
-              help='Allow code blocks without language hints.')
+# @click.command()
+# @click.argument(
+#     'inputs', nargs=-1, required=True, type=click.Path(exists=True))
+# @click.option('--output', default='{name}.py')
+# @click.option('--github/--markdown', default=bool(not markdown_enabled),
+#               help='Github-flavored fence blocks or pure markdown.')
+# @click.option('--safe/--unsafe', default=True,
+#               help='Allow code blocks without language hints.')
+
 def main(inputs, output, github, safe):
     collect_codeblocks = github_codeblocks if github else markdown_codeblocks
+    output = output.replace("{name}", "{name}_{index}")
 
     for filepath, depth in get_files(inputs):
         codeblocks = collect_codeblocks(filepath, safe)
@@ -124,11 +124,15 @@ def main(inputs, output, github, safe):
             filename = os.path.splitext(filepath)[0]
             outputname = os.sep.join(filename.split(os.sep)[-1-depth:])
 
-            outputfilename = output.format(name=outputname)
+            for i, blockitem in enumerate(codeblocks):
+                
+                outputfilename = output.format(name=outputname, index=i)
 
-            outputdir = os.path.dirname(outputfilename)
-            if not os.path.exists(outputdir):
-                makedirs(outputdir)
+                outputdir = os.path.dirname(outputfilename)
+                if not os.path.exists(outputdir):
+                    makedirs(outputdir)
 
-            with open(outputfilename, 'w') as outputfile:
-                outputfile.write('\n\n'.join(codeblocks))
+                with open(outputfilename, 'w', encoding="utf-8") as outputfile:
+                    outputfile.write(blockitem)
+
+main("./docs", "of_docs/{name}.py", True, True)
