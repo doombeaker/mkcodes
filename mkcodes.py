@@ -105,14 +105,6 @@ def makedirs(directory):
                 break
 
 
-# @click.command()
-# @click.argument(
-#     'inputs', nargs=-1, required=True, type=click.Path(exists=True))
-# @click.option('--output', default='{name}.py')
-# @click.option('--github/--markdown', default=bool(not markdown_enabled),
-#               help='Github-flavored fence blocks or pure markdown.')
-# @click.option('--safe/--unsafe', default=True,
-#               help='Allow code blocks without language hints.')
 argParser = argparse.ArgumentParser()
 argParser.add_argument("--output", default=os.path.join("output", '{name}.py'), help="output dir")
 argParser.add_argument("--github", default=(bool(markdown_enabled)), help="Ture/False")
