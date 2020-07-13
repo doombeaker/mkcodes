@@ -2,6 +2,7 @@ import os
 import re
 import glob
 import warnings
+import argparse
 
 try:
     import markdown as markdown_enabled
@@ -112,6 +113,13 @@ def makedirs(directory):
 #               help='Github-flavored fence blocks or pure markdown.')
 # @click.option('--safe/--unsafe', default=True,
 #               help='Allow code blocks without language hints.')
+argParser = argparse.ArgumentParser()
+argParser.add_argument("--output", default=os.path.join("output", '{name}.py'), help="output dir")
+argParser.add_argument("--github", default=(bool(markdown_enabled)), help="Ture/False")
+argParser.add_argument("--safe", default=True, help="Extract codeblock with language hints only")
+argParser.add_argument("input", help="Input directory")
+
+args = argParser.parse_args()
 
 def main(inputs, output, github, safe):
     collect_codeblocks = github_codeblocks if github else markdown_codeblocks
@@ -135,4 +143,5 @@ def main(inputs, output, github, safe):
                 with open(outputfilename, 'w', encoding="utf-8") as outputfile:
                     outputfile.write(blockitem)
 
-main("./docs", "of_docs/{name}.py", True, True)
+if __name__ == "__main__":
+    main([args.input], args.output, args.github, args.safe)
