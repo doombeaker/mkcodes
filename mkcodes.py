@@ -97,8 +97,6 @@ def makedirs(directory):
             directory, tail = os.path.split(directory)
             to_make.append(tail)
         else:
-            with open(os.path.join(directory, '__init__.py'), 'w', encoding="utf-8"):
-                pass
             if to_make:
                 directory = os.path.join(directory, to_make.pop())
             else:
@@ -132,6 +130,7 @@ def main(inputs, output, github, safe):
                     makedirs(outputdir)
 
                 with open(outputfilename, 'w', encoding="utf-8") as outputfile:
+                    print("saved to:", outputfilename)
                     outputfile.write(blockitem)
 
 if __name__ == "__main__":
