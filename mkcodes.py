@@ -121,8 +121,7 @@ def main(inputs, output, github, safe):
         codeblocks = collect_codeblocks(filepath, safe)
 
         if codeblocks:
-            filename = os.path.splitext(filepath)[0]
-            outputname = os.sep.join(filename.split(os.sep)[-1-depth:])
+            outputname = os.sep.join(filepath.split(os.sep)[-1-depth:])
 
             for i, blockitem in enumerate(codeblocks):
                 
